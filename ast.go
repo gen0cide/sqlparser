@@ -261,20 +261,20 @@ type Select struct {
 
 // Select.Distinct
 const (
-	DistinctStr      = "distinct "
-	StraightJoinHint = "straight_join "
+	DistinctStr      = "DISTINCT "
+	StraightJoinHint = "STRAIGHT_JOIN "
 )
 
 // Select.Lock
 const (
-	ForUpdateStr = " for update"
-	ShareModeStr = " lock in share mode"
+	ForUpdateStr = " FOR UPDATE"
+	ShareModeStr = " LOCK IN SHARE MODE"
 )
 
 // Select.Cache
 const (
-	SQLCacheStr   = "sql_cache "
-	SQLNoCacheStr = "sql_no_cache "
+	SQLCacheStr   = "SQL_CACHE "
+	SQLNoCacheStr = "SQL_NO_CACHE "
 )
 
 // AddOrder adds an order by element
@@ -289,7 +289,7 @@ func (node *Select) SetLimit(limit *Limit) {
 
 // Format formats the node.
 func (node *Select) Format(buf *TrackedBuffer) {
-	buf.Myprintf("select %v%s%s%s%v from %v%v%v%v%v%v%s",
+	buf.Myprintf("SELECT %v%s%s%s%v FROM %v%v%v%v%v%v%s",
 		node.Comments, node.Cache, node.Distinct, node.Hints, node.SelectExprs,
 		node.From, node.Where,
 		node.GroupBy, node.Having, node.OrderBy,
@@ -400,9 +400,9 @@ type Union struct {
 
 // Union.Type
 const (
-	UnionStr         = "union"
-	UnionAllStr      = "union all"
-	UnionDistinctStr = "union distinct"
+	UnionStr         = "UNION"
+	UnionAllStr      = "UNION ALL"
+	UnionDistinctStr = "UNION DISTINCT"
 )
 
 // AddOrder adds an order by element
@@ -441,7 +441,7 @@ type Stream struct {
 
 // Format formats the node.
 func (node *Stream) Format(buf *TrackedBuffer) {
-	buf.Myprintf("stream %v%v from %v",
+	buf.Myprintf("STREAM %v%v FROM %v",
 		node.Comments, node.SelectExpr, node.Table)
 }
 
@@ -478,13 +478,13 @@ type Insert struct {
 
 // DDL strings.
 const (
-	InsertStr  = "insert"
-	ReplaceStr = "replace"
+	InsertStr  = "INSERT"
+	ReplaceStr = "REPLACE"
 )
 
 // Format formats the node.
 func (node *Insert) Format(buf *TrackedBuffer) {
-	buf.Myprintf("%s %v%sinto %v%v%v %v%v",
+	buf.Myprintf("%s %v%sINTO %v%v%v %v%v",
 		node.Action,
 		node.Comments, node.Ignore,
 		node.Table, node.Partitions, node.Columns, node.Rows, node.OnDup)
@@ -528,7 +528,7 @@ type Update struct {
 
 // Format formats the node.
 func (node *Update) Format(buf *TrackedBuffer) {
-	buf.Myprintf("update %v%v set %v%v%v%v",
+	buf.Myprintf("UPDATE %v%v SET %v%v%v%v",
 		node.Comments, node.TableExprs,
 		node.Exprs, node.Where, node.OrderBy, node.Limit)
 }
@@ -562,11 +562,11 @@ type Delete struct {
 
 // Format formats the node.
 func (node *Delete) Format(buf *TrackedBuffer) {
-	buf.Myprintf("delete %v", node.Comments)
+	buf.Myprintf("DELETE %v", node.Comments)
 	if node.Targets != nil {
 		buf.Myprintf("%v ", node.Targets)
 	}
-	buf.Myprintf("from %v%v%v%v%v", node.TableExprs, node.Partitions, node.Where, node.OrderBy, node.Limit)
+	buf.Myprintf("FROM %v%v%v%v%v", node.TableExprs, node.Partitions, node.Where, node.OrderBy, node.Limit)
 }
 
 func (node *Delete) walkSubtree(visit Visit) error {
@@ -593,16 +593,16 @@ type Set struct {
 
 // Set.Scope or Show.Scope
 const (
-	SessionStr = "session"
-	GlobalStr  = "global"
+	SessionStr = "SESSION"
+	GlobalStr  = "GLOBAL"
 )
 
 // Format formats the node.
 func (node *Set) Format(buf *TrackedBuffer) {
 	if node.Scope == "" {
-		buf.Myprintf("set %v%v", node.Comments, node.Exprs)
+		buf.Myprintf("SET %v%v", node.Comments, node.Exprs)
 	} else {
-		buf.Myprintf("set %v%s %v", node.Comments, node.Scope, node.Exprs)
+		buf.Myprintf("SET %v%s %v", node.Comments, node.Scope, node.Exprs)
 	}
 }
 
@@ -630,13 +630,13 @@ type DBDDL struct {
 func (node *DBDDL) Format(buf *TrackedBuffer) {
 	switch node.Action {
 	case CreateStr:
-		buf.WriteString(fmt.Sprintf("%s database %s", node.Action, node.DBName))
+		buf.WriteString(fmt.Sprintf("%s DATABASE %s", node.Action, node.DBName))
 	case DropStr:
 		exists := ""
 		if node.IfExists {
-			exists = " if exists"
+			exists = " IF EXISTS"
 		}
-		buf.WriteString(fmt.Sprintf("%s database%s %v", node.Action, exists, node.DBName))
+		buf.WriteString(fmt.Sprintf("%s DATABASE%s %v", node.Action, exists, node.DBName))
 	}
 }
 
@@ -663,14 +663,14 @@ type DDL struct {
 
 // DDL strings.
 const (
-	CreateStr        = "create"
-	AlterStr         = "alter"
-	DropStr          = "drop"
-	RenameStr        = "rename"
-	TruncateStr      = "truncate"
-	CreateVindexStr  = "create vindex"
-	AddColVindexStr  = "add vindex"
-	DropColVindexStr = "drop vindex"
+	CreateStr        = "CREATE"
+	AlterStr         = "ALTER"
+	DropStr          = "DROP"
+	RenameStr        = "RENAME"
+	TruncateStr      = "TRUNCATE"
+	CreateVindexStr  = "CREATE VINDEX"
+	AddColVindexStr  = "ADD VINDEX"
+	DropColVindexStr = "DROP VINDEX"
 
 	// Vindex DDL param to specify the owner of a vindex
 	VindexOwnerStr = "owner"
@@ -681,28 +681,28 @@ func (node *DDL) Format(buf *TrackedBuffer) {
 	switch node.Action {
 	case CreateStr:
 		if node.TableSpec == nil {
-			buf.Myprintf("%s table %v", node.Action, node.NewName)
+			buf.Myprintf("%s TABLE %v", node.Action, node.NewName)
 		} else {
-			buf.Myprintf("%s table %v %v", node.Action, node.NewName, node.TableSpec)
+			buf.Myprintf("%s TABLE %v %v", node.Action, node.NewName, node.TableSpec)
 		}
 	case DropStr:
 		exists := ""
 		if node.IfExists {
-			exists = " if exists"
+			exists = " IF EXISTS"
 		}
-		buf.Myprintf("%s table%s %v", node.Action, exists, node.Table)
+		buf.Myprintf("%s TABLE%s %v", node.Action, exists, node.Table)
 	case RenameStr:
-		buf.Myprintf("%s table %v to %v", node.Action, node.Table, node.NewName)
+		buf.Myprintf("%s TABLE %v TO %v", node.Action, node.Table, node.NewName)
 	case AlterStr:
 		if node.PartitionSpec != nil {
-			buf.Myprintf("%s table %v %v", node.Action, node.Table, node.PartitionSpec)
+			buf.Myprintf("%s TABLE %v %v", node.Action, node.Table, node.PartitionSpec)
 		} else {
-			buf.Myprintf("%s table %v", node.Action, node.Table)
+			buf.Myprintf("%s TABLE %v", node.Action, node.Table)
 		}
 	case CreateVindexStr:
 		buf.Myprintf("%s %v %v", node.Action, node.VindexSpec.Name, node.VindexSpec)
 	case AddColVindexStr:
-		buf.Myprintf("alter table %v %s %v (", node.Table, node.Action, node.VindexSpec.Name)
+		buf.Myprintf("ALTER TABLE %v %s %v (", node.Table, node.Action, node.VindexSpec.Name)
 		for i, col := range node.VindexCols {
 			if i != 0 {
 				buf.Myprintf(", %v", col)
@@ -715,9 +715,9 @@ func (node *DDL) Format(buf *TrackedBuffer) {
 			buf.Myprintf(" %v", node.VindexSpec)
 		}
 	case DropColVindexStr:
-		buf.Myprintf("alter table %v %s %v", node.Table, node.Action, node.VindexSpec.Name)
+		buf.Myprintf("ALTER TABLE %v %s %v", node.Table, node.Action, node.VindexSpec.Name)
 	default:
-		buf.Myprintf("%s table %v", node.Action, node.Table)
+		buf.Myprintf("%s TABLE %v", node.Action, node.Table)
 	}
 }
 
@@ -734,7 +734,7 @@ func (node *DDL) walkSubtree(visit Visit) error {
 
 // Partition strings
 const (
-	ReorganizeStr = "reorganize partition"
+	ReorganizeStr = "REORGANIZE PARTITION"
 )
 
 // PartitionSpec describe partition actions (for alter and create)
@@ -748,7 +748,7 @@ type PartitionSpec struct {
 func (node *PartitionSpec) Format(buf *TrackedBuffer) {
 	switch node.Action {
 	case ReorganizeStr:
-		buf.Myprintf("%s %v into (", node.Action, node.Name)
+		buf.Myprintf("%s %v INTO (", node.Action, node.Name)
 		var prefix string
 		for _, pd := range node.Definitions {
 			buf.Myprintf("%s%v", prefix, pd)
@@ -785,9 +785,9 @@ type PartitionDefinition struct {
 // Format formats the node
 func (node *PartitionDefinition) Format(buf *TrackedBuffer) {
 	if !node.Maxvalue {
-		buf.Myprintf("partition %v values less than (%v)", node.Name, node.Limit)
+		buf.Myprintf("PARTITION %v VALUES LESS THAN (%v)", node.Name, node.Limit)
 	} else {
-		buf.Myprintf("partition %v values less than (maxvalue)", node.Name)
+		buf.Myprintf("PARTITION %v VALUES LESS THAN (MAXVALUE)", node.Name)
 	}
 }
 
@@ -1225,11 +1225,11 @@ func (node *VindexSpec) ParseParams() (string, map[string]string) {
 // the containing DDL node Format, so this just prints the type, any
 // parameters, and optionally the owner
 func (node *VindexSpec) Format(buf *TrackedBuffer) {
-	buf.Myprintf("using %v", node.Type)
+	buf.Myprintf("USING %v", node.Type)
 
 	numParams := len(node.Params)
 	if numParams != 0 {
-		buf.Myprintf(" with ")
+		buf.Myprintf(" WITH ")
 		for i, p := range node.Params {
 			if i != 0 {
 				buf.Myprintf(", ")
@@ -1285,30 +1285,30 @@ type Show struct {
 
 // Format formats the node.
 func (node *Show) Format(buf *TrackedBuffer) {
-	if node.Type == "tables" && node.ShowTablesOpt != nil {
+	if node.Type == "TABLES" && node.ShowTablesOpt != nil {
 		opt := node.ShowTablesOpt
 		if opt.DbName != "" {
 			if opt.Filter != nil {
-				buf.Myprintf("show %s%stables from %s %v", opt.Extended, opt.Full, opt.DbName, opt.Filter)
+				buf.Myprintf("SHOW %s%sTABLES FROM %s %v", opt.Extended, opt.Full, opt.DbName, opt.Filter)
 			} else {
-				buf.Myprintf("show %s%stables from %s", opt.Extended, opt.Full, opt.DbName)
+				buf.Myprintf("SHOW %s%sTABLES FROM %s", opt.Extended, opt.Full, opt.DbName)
 			}
 		} else {
 			if opt.Filter != nil {
-				buf.Myprintf("show %s%stables %v", opt.Extended, opt.Full, opt.Filter)
+				buf.Myprintf("SHOW %s%sTABLES %v", opt.Extended, opt.Full, opt.Filter)
 			} else {
-				buf.Myprintf("show %s%stables", opt.Extended, opt.Full)
+				buf.Myprintf("SHOW %s%sTABLES", opt.Extended, opt.Full)
 			}
 		}
 		return
 	}
 	if node.Scope == "" {
-		buf.Myprintf("show %s", node.Type)
+		buf.Myprintf("SHOW %s", node.Type)
 	} else {
-		buf.Myprintf("show %s %s", node.Scope, node.Type)
+		buf.Myprintf("SHOW %s %s", node.Scope, node.Type)
 	}
 	if node.HasOnTable() {
-		buf.Myprintf(" on %v", node.OnTable)
+		buf.Myprintf(" ON %v", node.OnTable)
 	}
 }
 
@@ -1338,9 +1338,9 @@ type ShowFilter struct {
 // Format formats the node.
 func (node *ShowFilter) Format(buf *TrackedBuffer) {
 	if node.Like != "" {
-		buf.Myprintf("like '%s'", node.Like)
+		buf.Myprintf("LIKE '%s'", node.Like)
 	} else {
-		buf.Myprintf("where %v", node.Filter)
+		buf.Myprintf("WHERE %v", node.Filter)
 	}
 }
 
@@ -1356,9 +1356,9 @@ type Use struct {
 // Format formats the node.
 func (node *Use) Format(buf *TrackedBuffer) {
 	if node.DBName.v != "" {
-		buf.Myprintf("use %v", node.DBName)
+		buf.Myprintf("USE %v", node.DBName)
 	} else {
-		buf.Myprintf("use")
+		buf.Myprintf("USE")
 	}
 }
 
@@ -1371,7 +1371,7 @@ type Begin struct{}
 
 // Format formats the node.
 func (node *Begin) Format(buf *TrackedBuffer) {
-	buf.WriteString("begin")
+	buf.WriteString("BEGIN")
 }
 
 func (node *Begin) walkSubtree(visit Visit) error {
@@ -1383,7 +1383,7 @@ type Commit struct{}
 
 // Format formats the node.
 func (node *Commit) Format(buf *TrackedBuffer) {
-	buf.WriteString("commit")
+	buf.WriteString("COMMIT")
 }
 
 func (node *Commit) walkSubtree(visit Visit) error {
@@ -1395,7 +1395,7 @@ type Rollback struct{}
 
 // Format formats the node.
 func (node *Rollback) Format(buf *TrackedBuffer) {
-	buf.WriteString("rollback")
+	buf.WriteString("ROLLBACK")
 }
 
 func (node *Rollback) walkSubtree(visit Visit) error {
@@ -1409,7 +1409,7 @@ type OtherRead struct{}
 
 // Format formats the node.
 func (node *OtherRead) Format(buf *TrackedBuffer) {
-	buf.WriteString("otherread")
+	buf.WriteString("OTHERREAD")
 }
 
 func (node *OtherRead) walkSubtree(visit Visit) error {
@@ -1424,7 +1424,7 @@ type OtherAdmin struct{}
 
 // Format formats the node.
 func (node *OtherAdmin) Format(buf *TrackedBuffer) {
-	buf.WriteString("otheradmin")
+	buf.WriteString("OTHERADMIN")
 }
 
 func (node *OtherAdmin) walkSubtree(visit Visit) error {
@@ -1509,7 +1509,7 @@ type AliasedExpr struct {
 func (node *AliasedExpr) Format(buf *TrackedBuffer) {
 	buf.Myprintf("%v", node.Expr)
 	if !node.As.IsEmpty() {
-		buf.Myprintf(" as %v", node.As)
+		buf.Myprintf(" AS %v", node.As)
 	}
 }
 
@@ -1531,7 +1531,7 @@ type Nextval struct {
 
 // Format formats the node.
 func (node Nextval) Format(buf *TrackedBuffer) {
-	buf.Myprintf("next %v values", node.Expr)
+	buf.Myprintf("NEXT %v VALUES", node.Expr)
 }
 
 func (node Nextval) walkSubtree(visit Visit) error {
@@ -1582,7 +1582,7 @@ func (node Partitions) Format(buf *TrackedBuffer) {
 	if node == nil {
 		return
 	}
-	prefix := " partition ("
+	prefix := " PARTITION ("
 	for _, n := range node {
 		buf.Myprintf("%s%v", prefix, n)
 		prefix = ", "
@@ -1644,7 +1644,7 @@ type AliasedTableExpr struct {
 func (node *AliasedTableExpr) Format(buf *TrackedBuffer) {
 	buf.Myprintf("%v%v", node.Expr, node.Partitions)
 	if !node.As.IsEmpty() {
-		buf.Myprintf(" as %v", node.As)
+		buf.Myprintf(" AS %v", node.As)
 	}
 	if node.Hints != nil {
 		// Hint node provides the space padding.
@@ -1775,10 +1775,10 @@ type JoinCondition struct {
 // Format formats the node.
 func (node JoinCondition) Format(buf *TrackedBuffer) {
 	if node.On != nil {
-		buf.Myprintf(" on %v", node.On)
+		buf.Myprintf(" ON %v", node.On)
 	}
 	if node.Using != nil {
-		buf.Myprintf(" using %v", node.Using)
+		buf.Myprintf(" USING %v", node.Using)
 	}
 }
 
@@ -1800,13 +1800,13 @@ type JoinTableExpr struct {
 
 // JoinTableExpr.Join
 const (
-	JoinStr             = "join"
-	StraightJoinStr     = "straight_join"
-	LeftJoinStr         = "left join"
-	RightJoinStr        = "right join"
-	NaturalJoinStr      = "natural join"
-	NaturalLeftJoinStr  = "natural left join"
-	NaturalRightJoinStr = "natural right join"
+	JoinStr             = "JOIN"
+	StraightJoinStr     = "STRAIGHT_JOIN"
+	LeftJoinStr         = "LEFT JOIN"
+	RightJoinStr        = "RIGHT JOIN"
+	NaturalJoinStr      = "NATURAL JOIN"
+	NaturalLeftJoinStr  = "NATURAL LEFT JOIN"
+	NaturalRightJoinStr = "NATURAL RIGHT JOIN"
 )
 
 // Format formats the node.
@@ -1834,14 +1834,14 @@ type IndexHints struct {
 
 // Index hints.
 const (
-	UseStr    = "use "
-	IgnoreStr = "ignore "
-	ForceStr  = "force "
+	UseStr    = "USE "
+	IgnoreStr = "IGNORE "
+	ForceStr  = "FORCE "
 )
 
 // Format formats the node.
 func (node *IndexHints) Format(buf *TrackedBuffer) {
-	buf.Myprintf(" %sindex ", node.Type)
+	buf.Myprintf(" %sINDEX ", node.Type)
 	prefix := "("
 	for _, n := range node.Indexes {
 		buf.Myprintf("%s%v", prefix, n)
@@ -1870,8 +1870,8 @@ type Where struct {
 
 // Where.Type
 const (
-	WhereStr  = "where"
-	HavingStr = "having"
+	WhereStr  = "WHERE"
+	HavingStr = "HAVING"
 )
 
 // NewWhere creates a WHERE or HAVING clause out
@@ -1998,7 +1998,7 @@ type AndExpr struct {
 
 // Format formats the node.
 func (node *AndExpr) Format(buf *TrackedBuffer) {
-	buf.Myprintf("%v and %v", node.Left, node.Right)
+	buf.Myprintf("%v AND %v", node.Left, node.Right)
 }
 
 func (node *AndExpr) walkSubtree(visit Visit) error {
@@ -2023,7 +2023,7 @@ type OrExpr struct {
 
 // Format formats the node.
 func (node *OrExpr) Format(buf *TrackedBuffer) {
-	buf.Myprintf("%v or %v", node.Left, node.Right)
+	buf.Myprintf("%v OR %v", node.Left, node.Right)
 }
 
 func (node *OrExpr) walkSubtree(visit Visit) error {
@@ -2048,7 +2048,7 @@ type NotExpr struct {
 
 // Format formats the node.
 func (node *NotExpr) Format(buf *TrackedBuffer) {
-	buf.Myprintf("not %v", node.Expr)
+	buf.Myprintf("NOT %v", node.Expr)
 }
 
 func (node *NotExpr) walkSubtree(visit Visit) error {
@@ -2105,12 +2105,12 @@ const (
 	GreaterEqualStr      = ">="
 	NotEqualStr          = "!="
 	NullSafeEqualStr     = "<=>"
-	InStr                = "in"
-	NotInStr             = "not in"
-	LikeStr              = "like"
-	NotLikeStr           = "not like"
-	RegexpStr            = "regexp"
-	NotRegexpStr         = "not regexp"
+	InStr                = "IN"
+	NotInStr             = "NOT IN"
+	LikeStr              = "LIKE"
+	NotLikeStr           = "NOT LIKE"
+	RegexpStr            = "REGEXP"
+	NotRegexpStr         = "NOT REGEXP"
 	JSONExtractOp        = "->"
 	JSONUnquoteExtractOp = "->>"
 )
@@ -2119,7 +2119,7 @@ const (
 func (node *ComparisonExpr) Format(buf *TrackedBuffer) {
 	buf.Myprintf("%v %s %v", node.Left, node.Operator, node.Right)
 	if node.Escape != nil {
-		buf.Myprintf(" escape %v", node.Escape)
+		buf.Myprintf(" ESCAPE %v", node.Escape)
 	}
 }
 
@@ -2148,13 +2148,13 @@ type RangeCond struct {
 
 // RangeCond.Operator
 const (
-	BetweenStr    = "between"
-	NotBetweenStr = "not between"
+	BetweenStr    = "BETWEEN"
+	NotBetweenStr = "NOT BETWEEN"
 )
 
 // Format formats the node.
 func (node *RangeCond) Format(buf *TrackedBuffer) {
-	buf.Myprintf("%v %s %v and %v", node.Left, node.Operator, node.From, node.To)
+	buf.Myprintf("%v %s %v AND %v", node.Left, node.Operator, node.From, node.To)
 }
 
 func (node *RangeCond) walkSubtree(visit Visit) error {
@@ -2181,12 +2181,12 @@ type IsExpr struct {
 
 // IsExpr.Operator
 const (
-	IsNullStr     = "is null"
-	IsNotNullStr  = "is not null"
-	IsTrueStr     = "is true"
-	IsNotTrueStr  = "is not true"
-	IsFalseStr    = "is false"
-	IsNotFalseStr = "is not false"
+	IsNullStr     = "IS NULL"
+	IsNotNullStr  = "IS NOT NULL"
+	IsTrueStr     = "IS TRUE"
+	IsNotTrueStr  = "IS NOT TRUE"
+	IsFalseStr    = "IS FALSE"
+	IsNotFalseStr = "IS NOT FALSE"
 )
 
 // Format formats the node.
